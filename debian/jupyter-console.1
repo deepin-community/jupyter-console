@@ -1,0 +1,36 @@
+.TH jupyter-console 1
+
+.SH NAME
+.PP
+jupyter-console \- Jupyter terminal client
+
+.SH SYNOPSIS
+.PP
+\fBjupyter console\fR [options]
+
+.SH DESCRIPTION
+.PP
+Interactive terminal client for kernels using the Jupyter protocol.
+
+.SH OPTIONS
+.PP
+Only a subset of options are listed here. To see the complete list, run
+.B
+jupyter console --help-all
+
+.HP
+--existing [ID]
+.IP
+Connect to an existing kernel. If no argument is given, connect to the most recent.
+.HP
+--no-confirm-exit
+.IP
+Don't prompt for confirmation when exiting.
+.HP
+--kernel NAME
+.IP
+Name of the lanuage kernel to use (default: python)
+.HP
+--debug
+.IP
+Enable debugging output

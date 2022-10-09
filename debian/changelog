@@ -1,0 +1,112 @@
+jupyter-console (6.4.0-3) unstable; urgency=medium
+
+  * Standards-Version: 4.6.0
+  * Backport jupyter_console#244 to fix incompatibility with jupyter_client 7
+
+ -- Gordon Ball <gordon@chronitis.net>  Tue, 09 Nov 2021 20:16:35 +0000
+
+jupyter-console (6.4.0-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * source only upload to enable migration (Closes: #996945)
+
+ -- Paul Gevers <elbrus@debian.org>  Thu, 21 Oct 2021 11:07:22 +0200
+
+jupyter-console (6.4.0-2) unstable; urgency=medium
+
+  * Update standards version to 4.5.1, no changes needed.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Sat, 21 Aug 2021 13:39:49 +0100
+
+jupyter-console (6.4.0-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/control: Update Maintainer field with new Debian Python Team
+    contact address.
+  * d/control: Update Vcs-* fields with new Debian Python Team Salsa
+    layout.
+
+  [ Gordon Ball ]
+  * d/watch: new github tarball URL
+  * New upstream version 6.4.0
+  * Rebase patches
+
+ -- Gordon Ball <gordon@chronitis.net>  Sun, 15 Aug 2021 18:33:25 +0000
+
+jupyter-console (6.2.0-1) unstable; urgency=medium
+
+  * New upstream version 6.2.0
+
+ -- Gordon Ball <gordon@chronitis.net>  Mon, 31 Aug 2020 15:09:54 +0000
+
+jupyter-console (6.1.0-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+
+  [ Gordon Ball ]
+  * Fix pypi.d.n URL in d/watch
+  * New upstream version 6.1.0
+  * Update to debhelper compat level 13
+  * Update to Standards-Version 4.5.0
+  * Refresh patches; drop ipython compat patch from 6.0.0-2
+
+ -- Gordon Ball <gordon@chronitis.net>  Fri, 15 May 2020 18:03:46 +0000
+
+jupyter-console (6.0.0-2) unstable; urgency=medium
+
+  * Patch out usage of a deprecated IPython python2 compatibility function
+    which was dropped in IPython 7.11, causing import errors.
+
+ -- Gordon Ball <gordon@chronitis.net>  Wed, 08 Jan 2020 22:21:32 +0000
+
+jupyter-console (6.0.0-1) unstable; urgency=medium
+
+  * New upstream release: 6.0.0
+  * Depend on prompt-toolkit >= 2 and ipython >= 7
+  * Update Standards-Version to 4.4.1
+  * Set Rules-Requires-Root: no
+
+ -- Gordon Ball <gordon@chronitis.net>  Mon, 06 Jan 2020 14:54:43 +0000
+
+jupyter-console (5.2.0-2) unstable; urgency=medium
+
+  * Drop support for python 2.7, and hence stop building the
+    python-jupyter-console binary package (Closes: #936773)
+  * Depend on debhelper-compat 12
+  * Update Standards-Version to 4.3.0
+
+  [ Ondřej Nový ]
+  * d/control: Set Vcs-* to salsa.debian.org
+  * d/copyright: Fix Format URL to correct one
+  * d/watch: Use https protocol
+  * d/control: Remove ancient X-Python-Version field
+  * d/control: Remove ancient X-Python3-Version field
+  * Use 'python3 -m sphinx' instead of sphinx-build for building docs
+  * Bump Standards-Version to 4.4.0.
+
+ -- Gordon Ball <gordon@chronitis.net>  Fri, 27 Sep 2019 18:10:11 +0000
+
+jupyter-console (5.2.0-1) unstable; urgency=medium
+
+  * New upstream version
+  * Add uversionmangle rule to d/watch to correctly sort beta versions
+  * Update Standards-Version to 4.1.1
+  * Add a dependency on jupyter-core for jupyter-console, to ensure that
+    the jupyter console subcommand is available.
+  * Use python3 sphinx for documentation, add ${sphinx:Built-Using} to the
+    documentation package
+  * Update years, use https URL in d/copyright
+  * Convert from git-dpm to gbp patches-unapplied format
+  * Patch out use of extension sphinxcontrib_github_alt in the documentation
+  * Add Testsuite: autopkgtest-pkg-python to d/control (only an autodep8
+    module-can-be-imported tested is performed)
+
+ -- Gordon Ball <gordon@chronitis.net>  Thu, 26 Oct 2017 00:43:42 +0200
+
+jupyter-console (5.0.0-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #842825)
+
+ -- Gordon Ball <gordon@chronitis.net>  Tue, 01 Nov 2016 14:49:53 +0000

@@ -1,0 +1,9 @@
+Document: python-jupyter-console-doc
+Title: Jupyter Console Documentation
+Author: Jupyter Development Team
+Abstract: Sphinx documentation for Jupyter Console
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-jupyter-console-doc/html/index.html
+Files: /usr/share/doc/python-jupyter-console-doc/html/*
