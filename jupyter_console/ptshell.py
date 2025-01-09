@@ -76,6 +76,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 from pygments.token import Token
 
+from jupyter_console.utils import run_sync, ensure_async
+
 
 def ask_yes_no(prompt, default=None, interrupt=None):
     """Asks a question and returns a boolean (y/n) answer.
@@ -314,7 +316,7 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
         ),
         default_value="multicolumn",
     ).tag(config=True)
-    
+
     prompt_includes_vi_mode = Bool(True,
         help="Display the current vi mode (when using vi editing mode)."
     ).tag(config=True)
@@ -372,7 +374,7 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
                 and self.prompt_includes_vi_mode):
             return '['+str(self.pt_cli.app.vi_state.input_mode)[3:6]+'] '
         return ''
-    
+
     def get_prompt_tokens(self, ec=None):
         if ec is None:
             ec = self.execution_count
@@ -647,31 +649,31 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
                 if code:
                     self.run_cell(code, store_history=True)
 
+    async def _main_task(self):
+        loop = asyncio.get_running_loop()
+        tasks = [asyncio.create_task(self.interact(loop=loop))]
+
+        if self.include_other_output:
+            # only poll the iopub channel asynchronously if we
+            # wish to include external content
+            tasks.append(asyncio.create_task(self.handle_external_iopub(loop=loop)))
+
+        _, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending:
+            task.cancel()
+        try:
+            await asyncio.gather(*pending)
+        except asyncio.CancelledError:
+            pass
+
     def mainloop(self):
         self.keepkernel = not self.own_kernel
-        loop = asyncio.get_event_loop()
         # An extra layer of protection in case someone mashing Ctrl-C breaks
         # out of our internal code.
         while True:
             try:
-                tasks = [self.interact(loop=loop)]
-
-                if self.include_other_output:
-                    # only poll the iopub channel asynchronously if we
-                    # wish to include external content
-                    tasks.append(self.handle_external_iopub(loop=loop))
-
-                main_task = asyncio.wait(tasks, loop=loop, return_when=asyncio.FIRST_COMPLETED)
-                _, pending = loop.run_until_complete(main_task)
-
-                for task in pending:
-                    task.cancel()
-                try:
-                    loop.run_until_complete(asyncio.gather(*pending))
-                except asyncio.CancelledError:
-                    pass
-                loop.stop()
-                loop.close()
+                asyncio.run(self._main_task())
                 break
             except KeyboardInterrupt:
                 print("\nKeyboardInterrupt escaped interact()\n")
@@ -705,8 +707,8 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
             return
 
         # flush stale replies, which could have been ignored, due to missed heartbeats
-        while self.client.shell_channel.msg_ready():
-            self.client.shell_channel.get_msg()
+        while run_sync(self.client.shell_channel.msg_ready)():
+            run_sync(self.client.shell_channel.get_msg)()
         # execute takes 'hidden', which is the inverse of store_hist
         msg_id = self.client.execute(cell, not store_history)
 
@@ -739,7 +741,8 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
     #-----------------
 
     def handle_execute_reply(self, msg_id, timeout=None):
-        msg = self.client.shell_channel.get_msg(block=False, timeout=timeout)
+        kwargs = {"timeout": timeout}
+        msg = run_sync(self.client.shell_channel.get_msg)(**kwargs)
         if msg["parent_header"].get("msg_id", None) == msg_id:
 
             self.handle_iopub(msg_id)
@@ -778,7 +781,8 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
         ## Get the is_complete response:
         msg = None
         try:
-            msg = self.client.shell_channel.get_msg(block=True, timeout=timeout)
+            kwargs = {"timeout": timeout}
+            msg = run_sync(self.client.shell_channel.get_msg)(**kwargs)
         except Empty:
             warn('The kernel did not respond to an is_complete_request. '
                  'Setting `use_kernel_is_complete` to False.')
@@ -834,12 +838,11 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
 
     async def handle_external_iopub(self, loop=None):
         while self.keep_running:
-            # we need to check for keep_running from time to time as
-            # we are blocking in an executor block which cannot be cancelled.
-            poll_result = await loop.run_in_executor(
-                None, self.client.iopub_channel.socket.poll, 500)
-            if(poll_result):
+            # we need to check for keep_running from time to time
+            poll_result = await ensure_async(self.client.iopub_channel.socket.poll(0))
+            if poll_result:
                 self.handle_iopub()
+            await asyncio.sleep(0.5)
 
     def handle_iopub(self, msg_id=''):
         """Process messages on the IOPub channel
@@ -849,8 +852,8 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
 
            It only displays output that is caused by this session.
         """
-        while self.client.iopub_channel.msg_ready():
-            sub_msg = self.client.iopub_channel.get_msg()
+        while run_sync(self.client.iopub_channel.msg_ready)():
+            sub_msg = run_sync(self.client.iopub_channel.get_msg)()
             msg_type = sub_msg['header']['msg_type']
 
             # Update execution_count in case it changed in another session
@@ -1003,7 +1006,7 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
     def handle_input_request(self, msg_id, timeout=0.1):
         """ Method to capture raw_input
         """
-        req = self.client.stdin_channel.get_msg(timeout=timeout)
+        req = run_sync(self.client.stdin_channel.get_msg)(timeout=timeout)
         # in case any iopub came while we were waiting:
         self.handle_iopub(msg_id)
         if msg_id == req["parent_header"].get("msg_id"):
@@ -1032,6 +1035,6 @@ class ZMQTerminalInteractiveShell(SingletonConfigurable):
 
             # only send stdin reply if there *was not* another request
             # or execution finished while we were reading.
-            if not (self.client.stdin_channel.msg_ready() or
-                    self.client.shell_channel.msg_ready()):
+            if not (run_sync(self.client.stdin_channel.msg_ready)() or
+                    run_sync(self.client.shell_channel.msg_ready)()):
                 self.client.input(raw_data)

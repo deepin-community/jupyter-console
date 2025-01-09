@@ -1,36 +1,32 @@
 # Releasing
 
-## Prerequisites
+## Using `jupyter_releaser`
 
-- Install `bump2version`
-- Install `twine`
+The recommended way to make a release is to use [`jupyter_releaser`](https://github.com/jupyter-server/jupyter_releaser#checklist-for-adoption).
 
-## Push to GitHub
+## Manual Release
 
-Change from patch to minor or major for appropriate version updates.
+### Prerequisites
+
+- First check that the CHANGELOG.md is up to date for the next release version
+- Install packaging requirements: `pip install hatch twine`
+
+### Bump version
+
+- `export version=<NEW_VERSION>`
+- `hatch version ${version}`
+
+### Push to GitHub
 
 ```bash
-# Commit, test, publish, tag release
-bump2version minor # CHECK FIRST: If the patch version currently set is not sufficient
-git commit -am "Prepared <release-id>"
-bump2version suffix  # Remove the .dev
-git commit -am "Generated release <release-id>"
-git tag <release_version_here>
-git push && git push --tags
+git push upstream && git push upstream --tags
 ```
 
-## Push to PyPI
+### Push to PyPI
 
 ```bash
 rm -rf dist/*
 rm -rf build/*
-python setup.py sdist bdist_wheel
-# Double check the dist/* files have the right verison (no `.dev`) and install the wheel to ensure it's good
-pip install dist/*
+hatch build .
 twine upload dist/*
 ```
-
-## Prep repo for development
-
-- `bumpversion patch # Resets the patch and dev versions`
-- `git commit -am "Resumed patch dev"; git push`

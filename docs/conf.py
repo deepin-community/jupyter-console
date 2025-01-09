@@ -16,6 +16,8 @@
 import sys
 import os
 import shlex
+import shutil
+from typing import Dict
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -73,7 +75,7 @@ author = 'The Jupyter Development Team'
 # built documents.
 #
 
-version_ns = {}
+version_ns: Dict = {}
 version_py = os.path.join('..', 'jupyter_console', '_version.py')
 with open(version_py) as f:
     exec(compile(f.read(), version_py, 'exec'), version_ns)
@@ -228,7 +230,7 @@ htmlhelp_basename = 'Jupyterconsoledoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+#latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
@@ -240,7 +242,7 @@ latex_elements = {
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
-}
+#}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
@@ -320,3 +322,9 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # otherwise, readthedocs.org uses their theme by default, so no need to specify it
+
+
+def setup(app):
+    HERE = os.path.abspath(os.path.dirname(__file__))
+    dest = os.path.join(HERE, 'changelog.md')
+    shutil.copy(os.path.join(HERE, '..', 'CHANGELOG.md'), dest)

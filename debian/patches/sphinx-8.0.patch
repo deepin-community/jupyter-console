@@ -1,0 +1,27 @@
+From: Colin Watson <cjwatson@debian.org>
+Date: Fri, 3 Jan 2025 14:50:16 +0000
+Subject: Port to Sphinx 8.0
+
+The old `intersphinx_mapping` format has been removed; it must now map
+identifiers to (target, inventory) tuples.
+
+Forwarded: https://github.com/jupyter/jupyter_console/pull/301
+Bug-Debian: https://bugs.debian.org/1090099
+Last-Update: 2025-01-03
+---
+ docs/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index 7ea597b..eac8d17 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -310,7 +310,7 @@ texinfo_documents = [
+ 
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'https://docs.python.org/3': None,}
++intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+ 
+ # on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
+ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
