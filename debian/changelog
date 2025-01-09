@@ -1,3 +1,39 @@
+jupyter-console (6.6.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * Port to Sphinx 8.0 (closes: #1090099).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 03 Jan 2025 14:54:07 +0000
+
+jupyter-console (6.6.3-1) unstable; urgency=medium
+
+  * New upstream version 6.6.3
+  * d/control: use pybuild-plugin-pyproject and hatchling instead of setuptools
+
+ -- Gordon Ball <gordon@chronitis.net>  Sat, 22 Jul 2023 19:39:59 +0000
+
+jupyter-console (6.4.4-2) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Apply multi-arch hints. + python-jupyter-console-doc: Add Multi-Arch: foreign.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Fri, 25 Nov 2022 02:34:44 +0000
+
+jupyter-console (6.4.4-1) unstable; urgency=medium
+
+  * New upstream version 6.4.4
+  * docs: fix substvar for built-using
+
+ -- Gordon Ball <gordon@chronitis.net>  Sat, 27 Aug 2022 21:30:51 +0200
+
+jupyter-console (6.4.3-1) unstable; urgency=medium
+
+  * d/watch: allow leading v in version
+  * New upstream version 6.4.3
+  * Drop backport patch from 6.4.0-3
+
+ -- Gordon Ball <gordon@chronitis.net>  Fri, 01 Apr 2022 11:24:08 +0000
+
 jupyter-console (6.4.0-3) unstable; urgency=medium
 
   * Standards-Version: 4.6.0
